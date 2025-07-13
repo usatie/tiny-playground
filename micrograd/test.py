@@ -66,9 +66,6 @@ def draw_dot(root):
 draw_dot(d)
 
 L.grad = 1.0
-L._backward()
-d._backward()
-e._backward()
-
+L.backward()
 dot = draw_dot(L)
 dot.render('out/dot')

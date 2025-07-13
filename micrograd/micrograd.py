@@ -9,6 +9,7 @@ class Value:
         self._op = _op
         self.label = label
         self.grad = 0.0
+        self._backward = lambda: None
 
     def __repr__(self):
         return f"Value(data={self.data}, grad={self.grad})"
@@ -31,3 +32,21 @@ class Value:
         out._backward = backward
         return out
 
+    def backward(self):
+        # Need to call backward method recursively, but how?
+        # We first need to topologically sort the nodes, and reverse it
+        order = []
+        visited = set()
+        def build_order(n):
+            if n not in visited:
+                visited.add(n)
+                for p in n._prev:
+                    build_order(p)
+                order.append(n)
+        build_order(self)
+
+        # This node should be a scalar, of course
+        # The start of the gradient should be 1
+        self.grad = 1.0
+        for node in reversed(order):
+            node._backward()
