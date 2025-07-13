@@ -1,5 +1,5 @@
 from micrograd import Value
-from nn import Neuron
+from nn import Neuron, Layer, MLP
 
 def f(x):
     return 3*x**2 - 4*x + 5
@@ -100,8 +100,43 @@ def test_neuron():
     dot = draw_dot(o)
     dot.render('out/neuron')
 
+def test_layer():
+    x = [2.0, 3.0, 4.0]
+    l = Layer(3, 4)
+    o = l(x)
+    print(o)
+
+def test_mlp():
+    x = [2.0, 3.0, 4.0]
+    n = MLP(3, [4,4,1])
+    o = n(x)
+    print(o)
+    dot = draw_dot(o)
+    dot.render('out/MLP')
+
+def test_training():
+    model = MLP(3, [4,4,1])
+    X_train = [
+        [2.0, 3.0, -1.0],
+        [3.0, -1.0, 0.5],
+        [0.5, 1.0, 1.0],
+        [1.0, 1.0, -1.0],
+    ]
+    y_train = [1.0, -1.0, -1.0, 1.0]
+    for _ in range(100):
+        ypred = [model(x) for x in X_train]
+        loss = sum([(yhat-y)**2 for y, yhat in zip(y_train, ypred)])
+        loss.backward()
+        for p in model.parameters():
+            p.data -= 0.01 * p.grad
+        model.zero_grad()
+    print(ypred)
+
 if __name__ == '__main__':
     test_simple_graph()
     test_perceptron()
     test_perceptron2()
     test_neuron()
+    test_layer()
+    test_mlp()
+    test_training()
