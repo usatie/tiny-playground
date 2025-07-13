@@ -16,23 +16,6 @@ plt.plot(xs, ys)
 plt.show()
 """
 
-a = Value(2.0, label='a')
-b = Value(-3.0, label='b')
-c = Value(10.0, label='c')
-e = a * b; e.label = 'e'
-d = e + c; d.label = 'd'
-f = Value(-2.0, label='f')
-L = d * f; L.label = 'L'
-print(a)
-print(a + b)
-print(a.__add__(b))
-print(a * b)
-print(a * b + c)
-print(a.__mul__(b).__add__(c))
-print(d)
-print(d._prev)
-print(d._op)
-
 from graphviz import Digraph
 
 def trace(root):
@@ -63,9 +46,31 @@ def draw_dot(root):
 
     return dot
 
-draw_dot(d)
 
-L.grad = 1.0
-L.backward()
-dot = draw_dot(L)
-dot.render('out/dot')
+def test_simple_graph():
+    a = Value(2.0, label='a')
+    b = Value(-3.0, label='b')
+    c = Value(10.0, label='c')
+    e = a * b; e.label = 'e'
+    d = e + c; d.label = 'd'
+    f = Value(-2.0, label='f')
+    L = d * f; L.label = 'L'
+    print(a)
+    print(a + b)
+    print(a.__add__(b))
+    print(a * b)
+    print(a * b + c)
+    print(a.__mul__(b).__add__(c))
+    print(d)
+    print(d._prev)
+    print(d._op)
+
+    draw_dot(d)
+
+    L.grad = 1.0
+    L.backward()
+    dot = draw_dot(L)
+    dot.render('out/dot')
+
+if __name__ == '__main__':
+    test_simple_graph()
