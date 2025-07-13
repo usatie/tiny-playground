@@ -1,4 +1,5 @@
 from micrograd import Value
+from nn import Neuron
 
 def f(x):
     return 3*x**2 - 4*x + 5
@@ -92,7 +93,15 @@ def test_perceptron2():
     dot = draw_dot(o)
     dot.render('out/perceptron2')
 
+def test_neuron():
+    x = [2.0, 3.0, 4.0]
+    n = Neuron(3)
+    o = n(x)
+    dot = draw_dot(o)
+    dot.render('out/neuron')
+
 if __name__ == '__main__':
     test_simple_graph()
     test_perceptron()
     test_perceptron2()
+    test_neuron()
