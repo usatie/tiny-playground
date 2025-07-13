@@ -17,7 +17,6 @@ class Value:
     def __add__(self, other):
         out = Value(self.data + other.data, (self, other), '+')
         def backward():
-            print(f"add.backward(), out={out}, self={self}, other={other}")
             self.grad += out.grad
             other.grad += out.grad
         out._backward = backward
@@ -26,11 +25,23 @@ class Value:
     def __mul__(self, other):
         out = Value(self.data * other.data, (self, other), '*')
         def backward():
-            print(f"mul.backward(), out={out}, self={self}, other={other}")
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
         out._backward = backward
         return out
+
+    # (exp(x) + exp(-1)) / (exp(x) - exp(-x))
+    def tanh(self):
+        x = self
+        out = Value(
+                (math.exp(self.data) - math.exp(-self.data))
+                / (math.exp(self.data) + math.exp(-self.data)), (self, ), 'tanh')
+        def backward():
+            # dtanh(x) = 1 - tanh(x)**2
+            self.grad = (1 - out.data**2) * out.grad
+        out._backward = backward
+        return out
+
 
     def backward(self):
         # Need to call backward method recursively, but how?
