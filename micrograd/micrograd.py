@@ -15,6 +15,7 @@ class Value:
         return f"Value(data={self.data}, grad={self.grad})"
 
     def __add__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data + other.data, (self, other), '+')
         def backward():
             self.grad += out.grad
@@ -22,11 +23,58 @@ class Value:
         out._backward = backward
         return out
 
+    def __radd__(self, other):
+        return self + other
+
+    def __sub__(self, other):
+        return self + (-other)
+
+    def __rsub__(self, other):
+        return (-self) + other
+
+    def __neg__(self):
+        out = Value(-self.data, (self), 'neg')
+        def backward():
+            self.grad += -other.grad
+        out._backward = backward
+        return out
+
     def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data * other.data, (self, other), '*')
         def backward():
             self.grad += other.data * out.grad
             other.grad += self.data * out.grad
+        out._backward = backward
+        return out
+
+    def __rmul__(self, other):
+        return self * other
+
+    def __pow__(self, other):
+        assert isinstance(other, int|float), "pow only accept int|float"
+        x = self.data
+        n = other
+        out = Value(x ** n, (self, ), 'pow')
+        def backward():
+            # (x**n)' = n * x**(n-1)
+            self.grad += n * (x ** (n-1)) * out.grad
+        out._backward = backward
+        return out
+
+    def __truediv__(self, other):
+        # a / b
+        # a * b**-1
+        return self * (other ** -1)
+
+
+    # exp(x) where x = self
+    def exp(self):
+        x = self
+        out = Value(math.exp(self.data), (self, ), 'exp')
+        def backward():
+            # exp(x)' = exp(x)
+            self.grad += math.exp(self.data) * out.grad
         out._backward = backward
         return out
 

@@ -55,17 +55,6 @@ def test_simple_graph():
     d = e + c; d.label = 'd'
     f = Value(-2.0, label='f')
     L = d * f; L.label = 'L'
-    print(a)
-    print(a + b)
-    print(a.__add__(b))
-    print(a * b)
-    print(a * b + c)
-    print(a.__mul__(b).__add__(c))
-    print(d)
-    print(d._prev)
-    print(d._op)
-
-    draw_dot(d)
 
     L.grad = 1.0
     L.backward()
@@ -87,6 +76,23 @@ def test_perceptron():
     dot = draw_dot(o)
     dot.render('out/perceptron')
 
+def test_perceptron2():
+    x1 = Value(2.0, label='x1')
+    x2 = Value(0, label='x2')
+    w1 = Value(-3.0, label='w1')
+    w2 = Value(1.0, label='w2')
+    b = Value(6.8813735870195432, label='b')
+    x1w1 = x1 * w1; x1w1.label = 'x1w1'
+    x2w2 = x2 * w2; x2w2.label = 'x2w2'
+    x1w1x2w2 = x1w1 + x2w2; x1w1x2w2.label = 'x1w1x2w2'
+    sigma = x1w1x2w2 + b; sigma.label = 'Σ'
+    e = (2 * sigma).exp(); e.label = 'e'
+    o = (e - 1) / (e + 1); o.label = 'o'
+    o.backward()
+    dot = draw_dot(o)
+    dot.render('out/perceptron2')
+
 if __name__ == '__main__':
     test_simple_graph()
     test_perceptron()
+    test_perceptron2()
